@@ -165,6 +165,15 @@
   #define STEP_PORT(i) _STEP_PORT(i)
   #define STEP_PIN(i) _PIN(STEP_PORT_##i)
 
+  //fake bit values for original grbl code
+  #define X_STEP_BIT    0
+  #define Y_STEP_BIT    1
+  #define Z_STEP_BIT    2
+  #define X_STEP_MASK (1<<X_STEP_BIT)
+  #define Y_STEP_MASK (1<<Y_STEP_BIT)
+  #define Z_STEP_MASK (1<<Z_STEP_BIT)
+  #define STEP_MASK (X_STEP_MASK|Y_STEP_MASK|Z_STEP_MASK) // All step bits
+
   // Define step direction output pins.
   #define DIRECTION_PORT_0 F
   #define DIRECTION_PORT_1 F
@@ -178,6 +187,15 @@
   #define _DIRECTION_PORT(i) _PORT(DIRECTION_PORT_##i)
   #define DIRECTION_PORT(i) _DIRECTION_PORT(i)
   #define DIRECTION_PIN(i) _PIN(DIRECTION_PORT_##i)
+
+  //fake bit values for original grbl code
+  #define X_DIRECTION_BIT   0
+  #define Y_DIRECTION_BIT   1
+  #define Z_DIRECTION_BIT   2
+  #define X_DIRECTION_MASK (1<<X_DIRECTION_BIT)
+  #define Y_DIRECTION_MASK (1<<Y_DIRECTION_BIT)
+  #define Z_DIRECTION_MASK (1<<Z_DIRECTION_BIT)
+  #define DIRECTION_MASK (X_DIRECTION_MASK|Y_DIRECTION_MASK|Z_DIRECTION_MASK) // All direction bits
 
   // Define stepper driver enable/disable output pin.
   #define STEPPER_DISABLE_PORT_0 D
