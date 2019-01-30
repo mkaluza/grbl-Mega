@@ -462,62 +462,54 @@ ISR(TIMER1_COMPA_vect)
   #else
     st.counter_x += st.exec_block->steps[X_AXIS];
   #endif
-  #ifdef DEFAULTS_RAMPS_BOARD
-    if (st.counter_x > st.exec_block->step_event_count) {
+  if (st.counter_x > st.exec_block->step_event_count) {
+    st.counter_x -= st.exec_block->step_event_count;
+    #ifdef DEFAULTS_RAMPS_BOARD
       st.step_outbits[X_AXIS] |= (1<<STEP_BIT(X_AXIS));
-      st.counter_x -= st.exec_block->step_event_count;
-      if (st.exec_block->direction_bits[X_AXIS] & (1<<DIRECTION_BIT(X_AXIS))) { sys_position[X_AXIS]--; }
-      else { sys_position[X_AXIS]++; }
-    }
-  #else
-    if (st.counter_x > st.exec_block->step_event_count) {
+      if (st.exec_block->direction_bits[X_AXIS] & (1<<DIRECTION_BIT(X_AXIS)))
+    #else
       st.step_outbits |= (1<<X_STEP_BIT);
-      st.counter_x -= st.exec_block->step_event_count;
-      if (st.exec_block->direction_bits & (1<<X_DIRECTION_BIT)) { sys_position[X_AXIS]--; }
-      else { sys_position[X_AXIS]++; }
-    }
-  #endif // Ramps Board
+      if (st.exec_block->direction_bits & (1<<X_DIRECTION_BIT))
+    #endif
+       { sys_position[X_AXIS]--; }
+       else { sys_position[X_AXIS]++; }
+  }
 
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
     st.counter_y += st.steps[Y_AXIS];
   #else
     st.counter_y += st.exec_block->steps[Y_AXIS];
   #endif
-  #ifdef DEFAULTS_RAMPS_BOARD
-    if (st.counter_y > st.exec_block->step_event_count) {
+  if (st.counter_y > st.exec_block->step_event_count) {
+    st.counter_y -= st.exec_block->step_event_count;
+    #ifdef DEFAULTS_RAMPS_BOARD
       st.step_outbits[Y_AXIS] |= (1<<STEP_BIT(Y_AXIS));
-      st.counter_y -= st.exec_block->step_event_count;
-      if (st.exec_block->direction_bits[Y_AXIS] & (1<<DIRECTION_BIT(Y_AXIS))) { sys_position[Y_AXIS]--; }
-      else { sys_position[Y_AXIS]++; }
-    }
-  #else
-    if (st.counter_y > st.exec_block->step_event_count) {
+      if (st.exec_block->direction_bits[Y_AXIS] & (1<<DIRECTION_BIT(Y_AXIS)))
+    #else
       st.step_outbits |= (1<<Y_STEP_BIT);
-      st.counter_y -= st.exec_block->step_event_count;
-      if (st.exec_block->direction_bits & (1<<Y_DIRECTION_BIT)) { sys_position[Y_AXIS]--; }
-      else { sys_position[Y_AXIS]++; }
-    }
-  #endif // Ramps Board
+      if (st.exec_block->direction_bits & (1<<Y_DIRECTION_BIT))
+    #endif
+       { sys_position[Y_AXIS]--; }
+       else { sys_position[Y_AXIS]++; }
+  }
+
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
     st.counter_z += st.steps[Z_AXIS];
   #else
     st.counter_z += st.exec_block->steps[Z_AXIS];
   #endif
-  #ifdef DEFAULTS_RAMPS_BOARD
-    if (st.counter_z > st.exec_block->step_event_count) {
+  if (st.counter_z > st.exec_block->step_event_count) {
+    st.counter_z -= st.exec_block->step_event_count;
+    #ifdef DEFAULTS_RAMPS_BOARD
       st.step_outbits[Z_AXIS] |= (1<<STEP_BIT(Z_AXIS));
-      st.counter_z -= st.exec_block->step_event_count;
-      if (st.exec_block->direction_bits[Z_AXIS] & (1<<DIRECTION_BIT(Z_AXIS))) { sys_position[Z_AXIS]--; }
-      else { sys_position[Z_AXIS]++; }
-    }
-  #else
-    if (st.counter_z > st.exec_block->step_event_count) {
+      if (st.exec_block->direction_bits[Z_AXIS] & (1<<DIRECTION_BIT(Z_AXIS)))
+    #else
       st.step_outbits |= (1<<Z_STEP_BIT);
-      st.counter_z -= st.exec_block->step_event_count;
-      if (st.exec_block->direction_bits & (1<<Z_DIRECTION_BIT)) { sys_position[Z_AXIS]--; }
-      else { sys_position[Z_AXIS]++; }
-    }
-  #endif // Ramps Board
+      if (st.exec_block->direction_bits & (1<<Z_DIRECTION_BIT))
+    #endif
+       { sys_position[Z_AXIS]--; }
+       else { sys_position[Z_AXIS]++; }
+  }
 
   // During a homing cycle, lock out and prevent desired axes from moving.
   #ifdef DEFAULTS_RAMPS_BOARD
