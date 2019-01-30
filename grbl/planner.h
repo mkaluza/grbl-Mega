@@ -31,6 +31,7 @@
 // Returned status message from planner.
 #define PLAN_OK true
 #define PLAN_EMPTY_BLOCK false
+#define PLAN_BACKLASH_SEND_AGAIN 2
 
 // Define planner data condition flags. Used to denote running conditions of a block.
 #define PL_COND_FLAG_RAPID_MOTION      bit(0)
@@ -74,6 +75,7 @@ typedef struct {
 
   // Stored spindle speed data used by spindle overrides and resuming methods.
   float spindle_speed;    // Block spindle speed. Copied from pl_line_data.
+  uint8_t backlash_motion;	//TODO extend condition field to uint16_t
 } plan_block_t;
 
 
