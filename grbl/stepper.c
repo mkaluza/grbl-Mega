@@ -57,21 +57,16 @@
 // NOTE: This data is copied from the prepped planner blocks so that the planner blocks may be
 // discarded when entirely consumed and completed by the segment buffer. Also, AMASS alters this
 // data for its own use.
-#ifdef DEFAULTS_RAMPS_BOARD
-  typedef struct {
-  uint32_t steps[N_AXIS];
-  uint32_t step_event_count;
-  uint8_t direction_bits[N_AXIS];
-  uint8_t is_pwm_rate_adjusted; // Tracks motions that require constant laser power/rate
-  } st_block_t;
-#else
   typedef struct {
     uint32_t steps[N_AXIS];
     uint32_t step_event_count;
+#ifdef DEFAULTS_RAMPS_BOARD
+    uint8_t direction_bits[N_AXIS];
+#else
     uint8_t direction_bits;
+#endif // Ramps Board
     uint8_t is_pwm_rate_adjusted; // Tracks motions that require constant laser power/rate
   } st_block_t;
-#endif // Ramps Board
 
 static st_block_t st_block_buffer[SEGMENT_BUFFER_SIZE-1];
 
