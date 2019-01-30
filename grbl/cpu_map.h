@@ -48,7 +48,10 @@
   #define X_DIRECTION_BIT   7 // MEGA2560 Digital Pin 30
   #define Y_DIRECTION_BIT   6 // MEGA2560 Digital Pin 31
   #define Z_DIRECTION_BIT   5 // MEGA2560 Digital Pin 32
-  #define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
+  #define X_DIRECTION_MASK (1<<X_DIRECTION_BIT)
+  #define Y_DIRECTION_MASK (1<<Y_DIRECTION_BIT)
+  #define Z_DIRECTION_MASK (1<<Z_DIRECTION_BIT)
+  #define DIRECTION_MASK (X_DIRECTION_MASK|Y_DIRECTION_MASK|Z_DIRECTION_MASK) // All direction bits
 
   // Define stepper driver enable/disable output pin.
   #define STEPPERS_DISABLE_DDR   DDRB
