@@ -38,12 +38,20 @@ THE SOFTWARE.
 
 import serial
 import time
+import sys
+
+device = '/dev/tty.usbmodem1811'
+gcode = 'grbl.gcode'
+if len(sys.argv) > 1:
+	gcode = sys.argv[1]
+if len(sys.argv) > 2:
+	device = sys.argv[2]
 
 # Open grbl serial port
-s = serial.Serial('/dev/tty.usbmodem1811',115200)
+s = serial.Serial(device, 115200)
 
 # Open g-code file
-f = open('grbl.gcode','r');
+f = open(gcode,'r');
 
 # Wake up grbl
 s.write("\r\n\r\n")
@@ -63,4 +71,4 @@ raw_input("  Press <Enter> to exit and disable grbl.")
 
 # Close file and serial port
 f.close()
-s.close()    
+s.close()
