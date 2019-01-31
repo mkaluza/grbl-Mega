@@ -373,7 +373,7 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
         bzero(unit_vec, sizeof(unit_vec));
         bzero(block->steps, sizeof(block->steps));
         block->step_event_count = 0;
-        block->condition = PL_COND_FLAG_RAPID_MOTION;
+        block->condition = settings.backlash_rapid || (block->condition & PL_COND_FLAG_RAPID_MOTION) ? PL_COND_FLAG_RAPID_MOTION : 0;
         block->backlash_motion = 1;
       }
       do_backlash |= get_direction_pin_mask(idx);

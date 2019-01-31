@@ -291,6 +291,7 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value) {
         if (int_value) { settings.flags |= BITFLAG_LASER_MODE; }
         else { settings.flags &= ~BITFLAG_LASER_MODE; }
         break;
+      case 33: settings.backlash_rapid = int_value; break;
       default:
         return(STATUS_INVALID_STATEMENT);
     }
