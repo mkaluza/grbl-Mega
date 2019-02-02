@@ -1,6 +1,7 @@
 This version of GRBL for ATMega2560 has the following added features:
 
 * backlash compensation
+* U,V,W relaive translation specification
 
 ![GitHub Logo](https://github.com/gnea/gnea-Media/blob/master/Grbl%20Logo/Grbl%20Logo%20250px.png?raw=true)
 ***
