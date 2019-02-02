@@ -51,6 +51,7 @@ $27=1.000
 $30=1000.
 $31=0.
 $32=0
+$33=0
 $100=250.000
 $101=250.000
 $102=250.000
@@ -227,6 +228,11 @@ When enabled, Grbl will move continuously through consecutive `G1`, `G2`, or `G3
 
 When disabled, Grbl will operate as it always has, stopping motion with every `S` spindle speed command. This is the default operation of a milling machine to allow a pause to let the spindle change speeds.
 
+#### $33 - Use rapid motion for backlash compensation
+
+0: use feed speed for G1,G2 etc.
+>0: always use rapid
+
 #### $100, $101 and $102 – [X,Y,Z] steps/mm
 
 Grbl needs to know how far each step will take the tool in reality. To calculate steps/mm for an axis of your machine you need to know:
@@ -257,3 +263,6 @@ Again, like the max rate setting, the simplest way to determine the values for t
 #### $130, $131, $132 – [X,Y,Z] Max travel, mm
 
 This sets the maximum travel from end to end for each axis in mm. This is only useful if you have soft limits (and homing) enabled, as this is only used by Grbl's soft limit feature to check if you have exceeded your machine limits with a motion command.
+
+
+#### $140, $141, $142 – [X,Y,Z] Backlash to compensate, mm
