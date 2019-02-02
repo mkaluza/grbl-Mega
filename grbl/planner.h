@@ -95,7 +95,7 @@ void plan_reset_buffer(); // Reset buffer only.
 // Add a new linear movement to the buffer. target[N_AXIS] is the signed, absolute target position
 // in millimeters. Feed rate specifies the speed of the motion. If feed rate is inverted, the feed
 // rate is taken to mean "frequency" and would complete the operation in 1/feed_rate minutes.
-uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data);
+uint8_t plan_buffer_line(float *_target, plan_line_data_t *pl_data);
 
 // Called when the current block is no longer needed. Discards the block and makes the memory
 // availible for new blocks.

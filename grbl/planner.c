@@ -313,7 +313,7 @@ void plan_update_velocity_profile_parameters()
    head. It avoids changing the planner state and preserves the buffer to ensure subsequent gcode
    motions are still planned correctly, while the stepper module only points to the block buffer head
    to execute the special system motion. */
-uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
+uint8_t plan_buffer_line(float *_target, plan_line_data_t *pl_data)
 {
   // Prepare and initialize new block. Copy relevant pl_data for block execution.
   plan_block_t *block = &block_buffer[block_buffer_head];
@@ -327,6 +327,9 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
   float unit_vec[N_AXIS], delta_mm;
   uint8_t idx;
   uint8_t do_backlash = 0;
+
+  float target[N_AXIS];
+  system_convert_skew_array_from_gcode(target, _target);
 
   // Copy position data based on type of motion being planned.
   if (block->condition & PL_COND_FLAG_SYSTEM_MOTION) { 
