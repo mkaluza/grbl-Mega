@@ -205,6 +205,7 @@ void report_grbl_settings() {
   report_util_float_setting(31,settings.rpm_min,N_DECIMAL_RPMVALUE);
   report_util_uint8_setting(32,bit_istrue(settings.flags,BITFLAG_LASER_MODE));
   report_util_uint8_setting(33,settings.backlash_rapid);
+  report_util_float_setting(34,settings.skew_xy, N_DECIMAL_SETTINGVALUE * 2);
   // Print axis settings
   uint8_t idx, set_idx;
   uint8_t val = AXIS_SETTINGS_START_VAL;

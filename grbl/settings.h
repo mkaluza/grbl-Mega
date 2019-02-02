@@ -110,8 +110,12 @@ typedef struct {
   uint16_t homing_debounce_delay;
   float homing_pulloff;
   uint8_t backlash_rapid;
+  float skew_xy;
 } settings_t;
 extern settings_t settings;
+
+extern float skew_xy_sin, skew_xy_cos, skew_xy_tan;
+void skew_init();
 
 // Initialize the configuration subsystem (load settings from EEPROM)
 void settings_init();

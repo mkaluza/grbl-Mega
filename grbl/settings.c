@@ -60,6 +60,8 @@ const __flash settings_t defaults = {\
     .max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL)};
 
 
+float skew_xy_sin = 0.0, skew_xy_cos = 1.0, skew_xy_tan = 0.0;
+
 // Method to store startup lines into EEPROM
 void settings_store_startup_line(uint8_t n, char *line)
 {
@@ -292,12 +294,20 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value) {
         else { settings.flags &= ~BITFLAG_LASER_MODE; }
         break;
       case 33: settings.backlash_rapid = int_value; break;
+      case 34: settings.skew_xy = value; skew_init(); break;
       default:
         return(STATUS_INVALID_STATEMENT);
     }
   }
   write_global_settings();
   return(STATUS_OK);
+}
+
+
+void skew_init() {
+  skew_xy_sin = sin(settings.skew_xy);
+  skew_xy_cos = cos(settings.skew_xy);
+  skew_xy_tan = tan(settings.skew_xy);
 }
 
 
@@ -308,6 +318,7 @@ void settings_init() {
     settings_restore(SETTINGS_RESTORE_ALL); // Force restore all EEPROM data.
     report_grbl_settings();
   }
+  skew_init();
 }
 
 
