@@ -308,6 +308,10 @@ uint8_t gc_execute_line(char *line)
 						if (value > MAX_TOOL_NUMBER) { FAIL(STATUS_GCODE_MAX_VALUE_EXCEEDED); }
 						gc_block.values.t = int_value;
 						break;
+          case 'U': word_bit = WORD_X; gc_block.values.xyz[X_AXIS] = gc_block.values.uvw[X_AXIS] = value; axis_words |= (1<<X_AXIS); break;
+          case 'V': word_bit = WORD_Y; gc_block.values.xyz[Y_AXIS] = gc_block.values.uvw[Y_AXIS] = value; axis_words |= (1<<Y_AXIS); break;
+          case 'W': word_bit = WORD_Z; gc_block.values.xyz[Z_AXIS] = gc_block.values.uvw[Z_AXIS] = value; axis_words |= (1<<Z_AXIS); break;
+
           case 'X': word_bit = WORD_X; gc_block.values.xyz[X_AXIS] = value; axis_words |= (1<<X_AXIS); break;
           case 'Y': word_bit = WORD_Y; gc_block.values.xyz[Y_AXIS] = value; axis_words |= (1<<Y_AXIS); break;
           case 'Z': word_bit = WORD_Z; gc_block.values.xyz[Z_AXIS] = value; axis_words |= (1<<Z_AXIS); break;
@@ -583,7 +587,7 @@ uint8_t gc_execute_line(char *line)
               // NOTE: G53 is never active with G28/30 since they are in the same modal group.
               if (gc_block.non_modal_command != NON_MODAL_ABSOLUTE_OVERRIDE) {
                 // Apply coordinate offsets based on distance mode.
-                if (gc_block.modal.distance == DISTANCE_MODE_ABSOLUTE) {
+                if (gc_block.modal.distance == DISTANCE_MODE_ABSOLUTE && gc_block.values.uvw[idx] == 0) {
                   gc_block.values.xyz[idx] += block_coord_system[idx] + gc_state.coord_offset[idx];
                   if (idx == TOOL_LENGTH_OFFSET_AXIS) { gc_block.values.xyz[idx] += gc_state.tool_length_offset; }
                 } else {  // Incremental mode
