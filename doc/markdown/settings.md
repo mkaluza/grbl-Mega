@@ -233,6 +233,9 @@ When disabled, Grbl will operate as it always has, stopping motion with every `S
 0: use feed speed for G1,G2 etc.
 >0: always use rapid
 
+#### $34 - X/Y skew angle, radians
+TODO
+
 #### $100, $101 and $102 – [X,Y,Z] steps/mm
 
 Grbl needs to know how far each step will take the tool in reality. To calculate steps/mm for an axis of your machine you need to know:
