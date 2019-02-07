@@ -105,7 +105,6 @@ typedef struct {
   #else
     uint8_t step_outbits;         // The next stepping-bits to be output
   #endif //Ramps Board
-  uint8_t dir_outbits;
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
     uint32_t steps[N_AXIS];
   #endif
@@ -352,14 +351,6 @@ ISR(TIMER1_COMPA_vect)
   if (busy) { return; } // The busy-flag is used to avoid reentering this interrupt
 
   // Set the direction pins a couple of nanoseconds before we step the steppers
-  #ifdef DEFAULTS_RAMPS_BOARD
-    DIRECTION_PORT(0) = (DIRECTION_PORT(0) & ~(1 << DIRECTION_BIT(0))) | (((st.dir_outbits & X_DIRECTION_MASK) >> X_DIRECTION_BIT) << DIRECTION_BIT(0));
-    DIRECTION_PORT(1) = (DIRECTION_PORT(1) & ~(1 << DIRECTION_BIT(1))) | (((st.dir_outbits & Y_DIRECTION_MASK) >> Y_DIRECTION_BIT) << DIRECTION_BIT(1));
-    DIRECTION_PORT(2) = (DIRECTION_PORT(2) & ~(1 << DIRECTION_BIT(2))) | (((st.dir_outbits & Z_DIRECTION_MASK) >> Z_DIRECTION_BIT) << DIRECTION_BIT(2));
-  #else
-    DIRECTION_PORT = (DIRECTION_PORT & ~DIRECTION_MASK) | (st.dir_outbits & DIRECTION_MASK);
-  #endif // Ramps Boafd
-
   // Then pulse the stepping pins
   #ifdef DEFAULTS_RAMPS_BOARD
     #ifdef STEP_PULSE_DELAY
@@ -412,7 +403,6 @@ ISR(TIMER1_COMPA_vect)
         // Initialize Bresenham line and distance counters
         st.counter_x = st.counter_y = st.counter_z = (st.exec_block->step_event_count >> 1);
       }
-      st.dir_outbits = st.exec_block->direction_bits ^ dir_port_invert_mask;
 
       #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
         // With AMASS enabled, adjust Bresenham axis increment counters according to AMASS level.
@@ -424,6 +414,14 @@ ISR(TIMER1_COMPA_vect)
       // Set real-time spindle output as segment is loaded, just prior to the first step.
       spindle_set_speed(st.exec_segment->spindle_pwm);
 
+      uint8_t dir_outbits = st.exec_block->direction_bits ^ dir_port_invert_mask;
+      #ifdef DEFAULTS_RAMPS_BOARD
+        DIRECTION_PORT(0) = (DIRECTION_PORT(0) & ~(1 << DIRECTION_BIT(0))) | (((dir_outbits & X_DIRECTION_MASK) >> X_DIRECTION_BIT) << DIRECTION_BIT(0));
+        DIRECTION_PORT(1) = (DIRECTION_PORT(1) & ~(1 << DIRECTION_BIT(1))) | (((dir_outbits & Y_DIRECTION_MASK) >> Y_DIRECTION_BIT) << DIRECTION_BIT(1));
+        DIRECTION_PORT(2) = (DIRECTION_PORT(2) & ~(1 << DIRECTION_BIT(2))) | (((dir_outbits & Z_DIRECTION_MASK) >> Z_DIRECTION_BIT) << DIRECTION_BIT(2));
+      #else
+        DIRECTION_PORT = (DIRECTION_PORT & ~DIRECTION_MASK) | (dir_outbits & DIRECTION_MASK);
+      #endif // Ramps Boafd
     } else {
       // Segment buffer empty. Shutdown.
       st_go_idle();
@@ -604,7 +602,6 @@ void st_reset()
   busy = false;
 
   st_generate_step_dir_invert_masks();
-  st.dir_outbits = dir_port_invert_mask; // Initialize direction bits to default.
   #ifdef DEFAULTS_RAMPS_BOARD
     DIRECTION_PORT(0) = (DIRECTION_PORT(0) & ~(1 << DIRECTION_BIT(0))) | (((dir_port_invert_mask & X_DIRECTION_MASK) >> X_DIRECTION_BIT) << DIRECTION_BIT(0));
     DIRECTION_PORT(1) = (DIRECTION_PORT(1) & ~(1 << DIRECTION_BIT(1))) | (((dir_port_invert_mask & Y_DIRECTION_MASK) >> Y_DIRECTION_BIT) << DIRECTION_BIT(1));
