@@ -500,8 +500,9 @@ ISR(TIMER1_COMPA_vect)
 
   // During a homing cycle, lock out and prevent desired axes from moving.
   #ifdef DEFAULTS_RAMPS_BOARD
-    for (i = 0; i < N_AXIS; i++)
-    if (sys.state == STATE_HOMING) { st.step_outbits[i] &= sys.homing_axis_lock[i]; }
+    if (sys.state == STATE_HOMING)
+      for (i = 0; i < N_AXIS; i++)
+        { st.step_outbits[i] &= sys.homing_axis_lock[i]; }
   #else
     if (sys.state == STATE_HOMING) { st.step_outbits &= sys.homing_axis_lock; }
   #endif // Ramps Board
