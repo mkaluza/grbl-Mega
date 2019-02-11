@@ -167,8 +167,8 @@
 
   //fake bit values for original grbl code
   #define X_STEP_BIT    0
-  #define Y_STEP_BIT    1
-  #define Z_STEP_BIT    2
+  #define Y_STEP_BIT    6
+  #define Z_STEP_BIT    3
   #define X_STEP_MASK (1<<X_STEP_BIT)
   #define Y_STEP_MASK (1<<Y_STEP_BIT)
   #define Z_STEP_MASK (1<<Z_STEP_BIT)

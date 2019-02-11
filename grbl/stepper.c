@@ -337,9 +337,8 @@ ISR(TIMER1_COMPA_vect)
       st.step_bits[2] = (STEP_PORT(2) & ~(1 << STEP_BIT(2))) | st.step_outbits[2]; // Store out_bits to prevent overwriting.
       */
     #else
-      STEP_PORT(0) = (STEP_PORT(0) & ~(1 << STEP_BIT(0))) | (st.step_outbits & X_STEP_MASK);
-      STEP_PORT(1) = (STEP_PORT(1) & ~(1 << STEP_BIT(1))) | ((st.step_outbits & Y_STEP_MASK) << (STEP_BIT(1) - Y_STEP_BIT));
-      STEP_PORT(2) = (STEP_PORT(2) & ~(1 << STEP_BIT(2))) | ((st.step_outbits & Z_STEP_MASK) << (STEP_BIT(2) - Z_STEP_BIT));
+      STEP_PORT(0) = (STEP_PORT(0) & ~(1 << STEP_BIT(0))) | (st.step_outbits & (X_STEP_MASK | Y_STEP_MASK));
+      STEP_PORT(2) = (STEP_PORT(2) & ~(1 << STEP_BIT(2))) | (st.step_outbits & Z_STEP_MASK);
     #endif
   #else  
     #ifdef STEP_PULSE_DELAY
@@ -472,9 +471,8 @@ ISR(TIMER1_COMPA_vect)
   // Reset stepping pins (leave the direction pins)
 step_off:
   #ifdef DEFAULTS_RAMPS_BOARD
-    STEP_PORT(0) = (STEP_PORT(0) & ~(1 << STEP_BIT(0))) | (step_port_invert_mask & X_STEP_MASK);
-    STEP_PORT(1) = (STEP_PORT(1) & ~(1 << STEP_BIT(1))) | ((step_port_invert_mask & Y_STEP_MASK) << (STEP_BIT(1) - Y_STEP_BIT));
-    STEP_PORT(2) = (STEP_PORT(2) & ~(1 << STEP_BIT(2))) | ((step_port_invert_mask & Z_STEP_MASK) << (STEP_BIT(2) - Z_STEP_BIT));
+    STEP_PORT(0) = (STEP_PORT(0) & ~(1 << STEP_BIT(0))) | (step_port_invert_mask & (X_STEP_MASK | Y_STEP_MASK));
+    STEP_PORT(2) = (STEP_PORT(2) & ~(1 << STEP_BIT(2))) | (step_port_invert_mask & Z_STEP_MASK);
   #else
     STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask & STEP_MASK);
   #endif // Ramps Board
