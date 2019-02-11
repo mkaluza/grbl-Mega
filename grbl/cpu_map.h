@@ -189,9 +189,9 @@
   #define DIRECTION_PIN(i) _PIN(DIRECTION_PORT_##i)
 
   //fake bit values for original grbl code
-  #define X_DIRECTION_BIT   0
-  #define Y_DIRECTION_BIT   1
-  #define Z_DIRECTION_BIT   2
+  #define X_DIRECTION_BIT   1
+  #define Y_DIRECTION_BIT   7
+  #define Z_DIRECTION_BIT   0
   #define X_DIRECTION_MASK (1<<X_DIRECTION_BIT)
   #define Y_DIRECTION_MASK (1<<Y_DIRECTION_BIT)
   #define Z_DIRECTION_MASK (1<<Z_DIRECTION_BIT)

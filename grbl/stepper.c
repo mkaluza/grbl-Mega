@@ -395,7 +395,7 @@ ISR(TIMER1_COMPA_vect)
       uint8_t dir_outbits = st.exec_block->direction_bits ^ dir_port_invert_mask;
       #ifdef DEFAULTS_RAMPS_BOARD
         DIRECTION_PORT(0) = (DIRECTION_PORT(0) & ~(X_DIRECTION_MASK | Y_DIRECTION_MASK)) | (dir_outbits & (X_DIRECTION_MASK | Y_DIRECTION_MASK));
-        DIRECTION_PORT(2) = (DIRECTION_PORT(2) & ~(Z_DIRECTION_MASK)) | (dir_outbits & Z_DIRECTION_MASK);
+        DIRECTION_PORT(2) = (DIRECTION_PORT(2) & ~(1 << DIRECTION_BIT(2))) | ((dir_outbits & Z_DIRECTION_MASK) << DIRECTION_BIT(2));
       #else
         DIRECTION_PORT = (DIRECTION_PORT & ~DIRECTION_MASK) | (dir_outbits & DIRECTION_MASK);
       #endif // Ramps Boafd
