@@ -149,6 +149,7 @@
 #define WORD_X  10
 #define WORD_Y  11
 #define WORD_Z  12
+#define WORD_H  13
 
 // Define g-code parser position updating flags
 #define GC_UPDATE_POS_TARGET   0 // Must be zero
@@ -198,6 +199,7 @@ typedef struct {
 
 typedef struct {
   float f;         // Feed
+  float h;         // arc height
   float ijk[3];    // I,J,K Axis arc offsets
   uint8_t l;       // G10 or canned cycles parameters
   int32_t n;       // Line number

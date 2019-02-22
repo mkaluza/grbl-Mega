@@ -293,6 +293,7 @@ uint8_t gc_execute_line(char *line)
           // case 'C': // Not supported
           // case 'D': // Not supported
           case 'F': word_bit = WORD_F; gc_block.values.f = value; break;
+          case 'H': word_bit = WORD_H; gc_block.values.h = value; break;
           // case 'H': // Not supported
           case 'I': word_bit = WORD_I; gc_block.values.ijk[X_AXIS] = value; ijk_words |= (1<<X_AXIS); break;
           case 'J': word_bit = WORD_J; gc_block.values.ijk[Y_AXIS] = value; ijk_words |= (1<<Y_AXIS); break;
@@ -687,6 +688,13 @@ uint8_t gc_execute_line(char *line)
           float x,y;
           x = gc_block.values.xyz[axis_0]-gc_state.position[axis_0]; // Delta x between current position and target
           y = gc_block.values.xyz[axis_1]-gc_state.position[axis_1]; // Delta y between current position and target
+
+          if (value_words & bit(WORD_H)) {
+            value_words |= bit(WORD_R);
+            bit_false(value_words,bit(WORD_H));
+
+            gc_block.values.r = (x*x + y*y)/(8*gc_block.values.h);
+          }
 
           if (value_words & bit(WORD_R)) { // Arc Radius Mode
             bit_false(value_words,bit(WORD_R));
