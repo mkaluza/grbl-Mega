@@ -678,6 +678,11 @@ uint8_t gc_execute_line(char *line)
           if (!axis_words) { FAIL(STATUS_GCODE_NO_AXIS_WORDS); } // [No axis words]
           if (!(axis_words & (bit(axis_0)|bit(axis_1)))) { FAIL(STATUS_GCODE_NO_AXIS_WORDS_IN_PLANE); } // [No axis words in plane]
 
+          if (bit_istrue(value_words,bit(WORD_P))) {
+            if (gc_block.values.p < 1 || gc_block.values.p != trunc(gc_block.values.p)) {FAIL(STATUS_INVALID_VALUE);}
+            bit_false(value_words,bit(WORD_P));
+          }
+
           // Calculate the change in position along each selected axis
           float x,y;
           x = gc_block.values.xyz[axis_0]-gc_state.position[axis_0]; // Delta x between current position and target
@@ -1045,6 +1050,19 @@ uint8_t gc_execute_line(char *line)
         pl_data->condition |= PL_COND_FLAG_RAPID_MOTION; // Set rapid motion condition flag.
         mc_line(gc_block.values.xyz, pl_data);
       } else if ((gc_state.modal.motion == MOTION_MODE_CW_ARC) || (gc_state.modal.motion == MOTION_MODE_CCW_ARC)) {
+        if (gc_block.values.p) {
+          uint8_t p = trunc(gc_block.values.p);
+          float linear_target = gc_block.values.xyz[axis_linear];
+          float linear_delta = (linear_target - gc_state.position[axis_linear]) / p;
+
+          while (--p) {
+            gc_block.values.xyz[axis_linear] =  gc_state.position[axis_linear] + linear_delta;
+            mc_arc(gc_block.values.xyz, pl_data, gc_state.position, gc_block.values.ijk, gc_block.values.r,
+              axis_0, axis_1, axis_linear, bit_istrue(gc_parser_flags,GC_PARSER_ARC_IS_CLOCKWISE));
+            memcpy(gc_state.position, gc_block.values.xyz, sizeof(gc_block.values.xyz)); // gc_state.position[] = gc_block.values.xyz[]
+          }
+          gc_block.values.xyz[axis_linear] =  linear_target;
+        }
         mc_arc(gc_block.values.xyz, pl_data, gc_state.position, gc_block.values.ijk, gc_block.values.r,
             axis_0, axis_1, axis_linear, bit_istrue(gc_parser_flags,GC_PARSER_ARC_IS_CLOCKWISE));
       } else {
