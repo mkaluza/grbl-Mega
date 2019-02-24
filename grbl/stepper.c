@@ -219,6 +219,7 @@ void st_wake_up()
   st.step_outbits = step_port_invert_mask;
 
   // Initialize step pulse timing from settings. Here to ensure updating after re-writing.
+  #ifndef STEP_PULSE_FAST_OFF
   #ifdef STEP_PULSE_DELAY
     // Set total step pulse time after direction pin set. Ad hoc computation from oscilloscope.
     st.step_pulse_time = -(((settings.pulse_microseconds+STEP_PULSE_DELAY-2)*TICKS_PER_MICROSECOND) >> 3);
@@ -227,6 +228,7 @@ void st_wake_up()
   #else // Normal operation
     // Set step pulse time. Ad hoc computation from oscilloscope. Uses two's complement.
     st.step_pulse_time = -(((settings.pulse_microseconds-2)*TICKS_PER_MICROSECOND) >> 3);
+  #endif
   #endif
 
   // Enable Stepper Driver Interrupt
@@ -315,10 +317,12 @@ ISR(TIMER1_COMPA_vect)
     STEP_PORT = (STEP_PORT & ~STEP_MASK) | st.step_outbits;
   #endif
 
+#ifndef STEP_PULSE_FAST_OFF
   // Enable step pulse reset timer so that The Stepper Port Reset Interrupt can reset the signal after
   // exactly settings.pulse_microseconds microseconds, independent of the main Timer1 prescaler.
   TCNT0 = st.step_pulse_time; // Reload Timer0 counter
   TCCR0B = (1<<CS01); // Begin Timer0. Full speed, 1/8 prescaler
+#endif
 
   busy = true;
   sei(); // Re-enable interrupts to allow Stepper Port Reset Interrupt to fire on-time.
@@ -373,7 +377,11 @@ ISR(TIMER1_COMPA_vect)
         if (st.exec_block->is_pwm_rate_adjusted) { spindle_set_speed(SPINDLE_PWM_OFF_VALUE); }
       #endif
       system_set_exec_state_flag(EXEC_CYCLE_STOP); // Flag main program for cycle end
+#ifndef STEP_PULSE_FAST_OFF
       return; // Nothing to do but exit.
+#else
+      goto step_off; // Nothing to do but exit.
+#endif
     }
   }
 
@@ -430,6 +438,12 @@ ISR(TIMER1_COMPA_vect)
   }
 
   st.step_outbits ^= step_port_invert_mask;  // Apply step port invert mask
+
+  // Reset stepping pins (leave the direction pins)
+step_off:
+#ifdef STEP_PULSE_FAST_OFF
+  STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask & STEP_MASK);
+#endif
   busy = false;
 }
 
@@ -442,6 +456,7 @@ ISR(TIMER1_COMPA_vect)
    cause issues at high step rates if another high frequency asynchronous interrupt is
    added to Grbl.
 */
+#ifndef STEP_PULSE_FAST_OFF
 // This interrupt is enabled by ISR_TIMER1_COMPAREA when it sets the motor port bits to execute
 // a step. This ISR resets the motor port after a short period (settings.pulse_microseconds)
 // completing one step cycle.
@@ -451,12 +466,13 @@ ISR(TIMER0_OVF_vect)
   STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask & STEP_MASK);
   TCCR0B = 0; // Disable Timer0 to prevent re-entering this interrupt when it's not needed.
 }
-#ifdef STEP_PULSE_DELAY
+#endif
   // This interrupt is used only when STEP_PULSE_DELAY is enabled. Here, the step pulse is
   // initiated after the STEP_PULSE_DELAY time period has elapsed. The ISR TIMER2_OVF interrupt
   // will then trigger after the appropriate settings.pulse_microseconds, as in normal operation.
   // The new timing between direction, step pulse, and step complete events are setup in the
   // st_wake_up() routine.
+#ifdef STEP_PULSE_DELAY
   ISR(TIMER0_COMPA_vect)
   {
     STEP_PORT = st.step_bits; // Begin step pulse.

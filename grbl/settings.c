@@ -23,8 +23,10 @@
 
 settings_t settings;
 
-const __flash settings_t defaults = {\
+const __flash settings_t defaults = {
+#ifndef STEP_PULSE_FAST_OFF
     .pulse_microseconds = DEFAULT_STEP_PULSE_MICROSECONDS,
+#endif
     .stepper_idle_lock_time = DEFAULT_STEPPER_IDLE_LOCK_TIME,
     .step_invert_mask = DEFAULT_STEPPING_INVERT_MASK,
     .dir_invert_mask = DEFAULT_DIRECTION_INVERT_MASK,
@@ -228,9 +230,11 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value) {
     // Store non-axis Grbl settings
     uint8_t int_value = trunc(value);
     switch(parameter) {
+#ifndef STEP_PULSE_FAST_OFF
       case 0:
         if (int_value < 3) { return(STATUS_SETTING_STEP_PULSE_MIN); }
         settings.pulse_microseconds = int_value; break;
+#endif
       case 1: settings.stepper_idle_lock_time = int_value; break;
       case 2:
         settings.step_invert_mask = int_value;

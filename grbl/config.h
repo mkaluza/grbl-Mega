@@ -424,6 +424,12 @@
 // values for certain setups have ranged from 5 to 20us.
 // #define STEP_PULSE_DELAY 10 // Step pulse delay in microseconds. Default disabled.
 
+// Switch step pins back to off state at the and of main ISR. TODO doc
+#define STEP_PULSE_FAST_OFF
+
+#ifdef STEP_PULSE_DELAY
+#undef STEP_PULSE_FAST_OFF
+#endif
 // The number of linear motions in the planner buffer to be planned at any give time. The vast
 // majority of RAM that Grbl uses is based on this buffer size. Only increase if there is extra
 // available RAM, like when re-compiling for a Mega2560. Or decrease if the Arduino begins to
