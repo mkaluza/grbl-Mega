@@ -367,7 +367,7 @@ ISR(TIMER1_COMPA_vect)
 
       uint8_t dir_outbits = st.exec_block->direction_bits ^ dir_port_invert_mask;
       // Set the direction pins a couple of nanoseconds after we step the steppers
-      DIRECTION_PORT = (DIRECTION_PORT & ~DIRECTION_MASK) | (dir_outbits & DIRECTION_MASK);
+      DIRECTION_PORT = (DIRECTION_PORT & ~DIRECTION_MASK) | (dir_outbits);
 
     } else {
       // Segment buffer empty. Shutdown.
@@ -442,7 +442,7 @@ ISR(TIMER1_COMPA_vect)
   // Reset stepping pins (leave the direction pins)
 step_off:
 #ifdef STEP_PULSE_FAST_OFF
-  STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask & STEP_MASK);
+  STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask);
 #endif
   busy = false;
 }
@@ -463,7 +463,7 @@ step_off:
 ISR(TIMER0_OVF_vect)
 {
   // Reset stepping pins (leave the direction pins)
-  STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask & STEP_MASK);
+  STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask);
   TCCR0B = 0; // Disable Timer0 to prevent re-entering this interrupt when it's not needed.
 }
 #endif
