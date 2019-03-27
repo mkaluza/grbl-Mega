@@ -132,6 +132,7 @@ typedef struct {
   uint8_t st_block_index;  // Index of stepper common data block being prepped
   uint8_t recalculate_flag;
 
+  uint8_t last_amass_level;
   uint16_t last_cycles_per_tick;
 
   float dt_remainder;
@@ -1049,12 +1050,25 @@ void st_prep_buffer()
         prep_segment->n_step <<= prep_segment->amass_level;
       }
       if (cycles >= (1UL << 16)) cycles = 0xffff; // Just set the slowest speed possible.
-      if (cycles > prep.last_cycles_per_tick)
-        prep_segment->cycles_delta_per_tick = (cycles - prep.last_cycles_per_tick) / prep_segment->n_step;
-      else
-        prep_segment->cycles_delta_per_tick =  -((prep.last_cycles_per_tick - cycles) / prep_segment->n_step);
-      prep_segment->cycles_per_tick = prep.last_cycles_per_tick;
-      prep.last_cycles_per_tick = cycles & 0xffff;
+      if (prep.last_cycles_per_tick != 0xffff) {
+        if (prep_segment->amass_level != prep.last_amass_level) {
+          if (prep_segment->amass_level > prep.last_amass_level) {
+            prep.last_cycles_per_tick >>= (prep_segment->amass_level - prep.last_amass_level);
+          } else {
+            prep.last_cycles_per_tick <<= (prep.last_amass_level - prep_segment->amass_level);
+          }
+        }
+        if (cycles >= prep.last_cycles_per_tick)
+          prep_segment->cycles_delta_per_tick = (cycles - prep.last_cycles_per_tick) / prep_segment->n_step;
+        else
+          prep_segment->cycles_delta_per_tick =  -((prep.last_cycles_per_tick - cycles) / prep_segment->n_step);
+        prep_segment->cycles_per_tick = prep.last_cycles_per_tick;
+      } else {
+        prep_segment->cycles_per_tick = cycles;
+        prep_segment->cycles_delta_per_tick = 0;
+      }
+      prep.last_cycles_per_tick = cycles;
+      prep.last_amass_level = prep_segment->amass_level;
     #else
       // Compute step timing and timer prescalar for normal step generation.
       if (cycles < (1UL << 16)) { // < 65536  (4.1ms @ 16MHz)
