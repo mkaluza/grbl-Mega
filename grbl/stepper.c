@@ -74,6 +74,7 @@ static st_block_t st_block_buffer[SEGMENT_BUFFER_SIZE-1];
 typedef struct {
   uint16_t n_step;           // Number of step events to be executed for this segment
   uint16_t cycles_per_tick;  // Step distance traveled per ISR tick, aka step rate.
+  int16_t cycles_delta_per_tick;
   uint8_t  st_block_index;   // Stepper block data index. Uses this information to execute this segment.
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
     uint8_t amass_level;    // Indicates AMASS level for the ISR to execute this segment
@@ -130,6 +131,8 @@ static st_block_t *st_prep_block;  // Pointer to the stepper block data being pr
 typedef struct {
   uint8_t st_block_index;  // Index of stepper common data block being prepped
   uint8_t recalculate_flag;
+
+  uint16_t last_cycles_per_tick;
 
   float dt_remainder;
   float steps_remaining;
@@ -407,6 +410,8 @@ ISR(TIMER1_COMPA_vect)
       system_set_exec_state_flag(EXEC_CYCLE_STOP); // Flag main program for cycle end
       goto step_off; // Nothing to do but exit.
     }
+  } else {
+    OCR1A = OCR1A + st.exec_segment->cycles_delta_per_tick;
   }
 
 
@@ -859,6 +864,8 @@ void st_prep_buffer()
 				}
 			}
       
+      if (prep.current_speed == 0) prep.last_cycles_per_tick = 0xffff;
+
       bit_true(sys.step_control, STEP_CONTROL_UPDATE_SPINDLE_PWM); // Force update whenever updating block.
     }
     
@@ -1041,8 +1048,13 @@ void st_prep_buffer()
         cycles >>= prep_segment->amass_level;
         prep_segment->n_step <<= prep_segment->amass_level;
       }
-      if (cycles < (1UL << 16)) { prep_segment->cycles_per_tick = cycles; } // < 65536 (4.1ms @ 16MHz)
-      else { prep_segment->cycles_per_tick = 0xffff; } // Just set the slowest speed possible.
+      if (cycles >= (1UL << 16)) cycles = 0xffff; // Just set the slowest speed possible.
+      if (cycles > prep.last_cycles_per_tick)
+        prep_segment->cycles_delta_per_tick = (cycles - prep.last_cycles_per_tick) / prep_segment->n_step;
+      else
+        prep_segment->cycles_delta_per_tick =  -((prep.last_cycles_per_tick - cycles) / prep_segment->n_step);
+      prep_segment->cycles_per_tick = prep.last_cycles_per_tick;
+      prep.last_cycles_per_tick = cycles & 0xffff;
     #else
       // Compute step timing and timer prescalar for normal step generation.
       if (cycles < (1UL << 16)) { // < 65536  (4.1ms @ 16MHz)
